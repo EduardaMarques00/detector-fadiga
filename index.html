@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Detector de Fadiga EAR + MAR</title>
+<title>Detector de Sonolência · SBESC 2026</title>
 <style>
   :root{--bg:#f4f7f7;--card:#fff;--ink:#12302f;--mut:#5b7170;--teal:#0a7c7a;--ok:#1e9e5a;--warn:#e08a00;--bad:#d62839;--line:#d6e2e1}
   @media (prefers-color-scheme:dark){:root{--bg:#0e1a1a;--card:#162626;--ink:#e6f2f1;--mut:#92aaa8;--teal:#3cc4c0;--line:#294040}}
@@ -36,24 +36,71 @@
   label{display:block;font-size:.8rem;color:var(--mut);margin-top:8px}
   input[type=range]{width:100%}
   small{color:var(--mut)}
-  #msg{font-size:.85rem;color:var(--mut)}
+
+  /* ---------- tela inicial: Salvador ---------- */
+  #landing{position:fixed;inset:0;z-index:50;overflow:auto;color:#1d2b3a;
+           background:#8fc3ea url(salvador.jpg) 72% center/cover no-repeat;
+           font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+  .l-wrap{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+          padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 36px)}
+  .l-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .pill{background:rgba(255,255,255,.93);border-radius:999px;padding:5px 12px;font-family:system-ui,sans-serif;
+        font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+  .lang{background:rgba(255,255,255,.93);border:0;color:#1d2b3a;border-radius:999px;padding:6px 14px;
+        font-family:system-ui,sans-serif;font-size:.75rem;font-weight:700}
+  .l-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+            text-align:center;padding:18px 0}
+  .l-card{width:100%;background:rgba(255,255,255,.95);border-radius:18px;padding:22px 22px 20px;
+          box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .l-card h2{font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.08;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+  .by{font-size:.92rem;margin:0 0 14px;font-style:italic;color:#4a5a68}
+  .lead{font-size:1.05rem;line-height:1.4;margin:0 0 10px}
+  .steps{margin:0 auto;padding-left:1.2em;font-size:.95rem;line-height:1.5;text-align:left;display:inline-block}
+  #start{background:#1d2b3a;color:#fbe9c6;border-radius:999px;padding:16px 38px;font-family:system-ui,sans-serif;
+         font-size:1.1rem;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+  #start:disabled{opacity:.6}
+  #msg{font-family:system-ui,sans-serif;font-size:.85rem;margin:0;font-weight:600;background:rgba(255,255,255,.95);
+       padding:6px 12px;border-radius:10px}
+  #msg:empty{display:none}
+  .priv{font-family:system-ui,sans-serif;font-size:.72rem;margin:0;background:rgba(255,255,255,.88);
+        padding:5px 12px;border-radius:8px}
+  .credit{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 6px);z-index:60;
+          font:11px system-ui,sans-serif;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8)}
 </style>
 </head>
 <body>
+
+<!-- ===== TELA INICIAL ===== -->
+<section id="landing">
+
+  <div class="l-wrap">
+    <div class="l-top"><span class="pill" data-i="eyebrow"></span><button class="lang" type="button">EN</button></div>
+    <div class="l-center">
+      <div class="l-card">
+        <h2 data-i="h"></h2>
+        <p class="by" data-i="by"></p>
+        <p class="lead" data-i="lead"></p>
+        <ol class="steps">
+          <li data-i="s1"></li><li data-i="s2"></li><li data-i="s3"></li>
+        </ol>
+      </div>
+      <button id="start" type="button" data-i="begin"></button>
+      <p id="msg"></p>
+      <p class="priv" data-i="priv"></p>
+    </div>
+  </div>
+  <span class="credit">Foto: dezalb · Pixabay</span>
+</section>
+
+<!-- ===== TELA DE DETECÇÃO ===== -->
 <main>
   <header>
     <div>
       <h1 data-i="title"></h1>
       <p data-i="sub"></p>
     </div>
-    <button class="ghost" id="lang">EN</button>
+    <button class="ghost lang" type="button">EN</button>
   </header>
-
-  <div class="card">
-    <p id="intro" data-i="intro" style="margin:0 0 10px;font-size:.9rem"></p>
-    <button id="start" data-i="start"></button>
-    <p id="msg"></p>
-  </div>
 
   <div id="stage">
     <video id="v" playsinline muted></video>
@@ -92,9 +139,13 @@ import {FaceLandmarker, FilesetResolver} from "https://cdn.jsdelivr.net/npm/@med
 
 // ---------- textos ----------
 const T = {
-  pt:{title:"Detector de Fadiga · EAR + MAR",sub:"Prévia do projeto do pôster · SBESC 2026",
-    intro:"Feche os olhos por mais de 1,5 s com a boca fechada para disparar o alerta. Sorrir ou bocejar com os olhos fechados não dispara.",
-    start:"Iniciar câmera",closed:"Olhos fechados",det:"Detecções",
+  pt:{eyebrow:"XVI SBESC · Salvador · 24–27 nov 2026",h:"Detector de sonolência",
+    by:"Maria Eduarda Santana Marques · UFC Quixadá",
+    lead:"Este é o teste do meu pôster, só que no seu celular.",
+    s1:"Deixe o rosto visível na câmera frontal.",s2:"Feche os olhos por mais de 1,5 s: o alerta dispara.",s3:"Sorria ou boceje de olhos fechados: o alerta não dispara.",
+    begin:"Começar o teste",
+    title:"Detector de Fadiga · EAR + MAR",sub:"Prévia do projeto do pôster · SBESC 2026",
+    closed:"Olhos fechados",det:"Detecções",
     vnote:"Simulação do veículo: o alerta equivale ao comando 'p' (parar); 2 s de olhos abertos equivalem ao 'c' (continuar), e o veículo espera mais 2 s antes de andar.",
     calib:"Calibração",earT:"Limiar EAR",marT:"Limiar MAR",tAlert:"Tempo de alerta",
     priv:"A imagem é processada no seu aparelho e não é enviada nem gravada.",
@@ -102,9 +153,13 @@ const T = {
     alert:"⚠ FADIGA DETECTADA · veículo pararia aqui",laugh:"Riso/bocejo detectado · não é fadiga",
     verify:"Verificando vigília…",resume:"Vigília confirmada · veículo retomando…",
     run:"RODANDO",stop:"PARADO",wait:"AGUARDANDO",err:"Não foi possível acessar a câmera. Verifique a permissão e se a página está em HTTPS."},
-  en:{title:"Drowsiness Detector · EAR + MAR",sub:"Poster project preview · SBESC 2026",
-    intro:"Close your eyes for more than 1.5 s with your mouth closed to trigger the alert. Smiling or yawning with closed eyes does not.",
-    start:"Start camera",closed:"Eyes closed",det:"Detections",
+  en:{eyebrow:"XVI SBESC · Salvador · Nov 24–27, 2026",h:"Drowsiness detector",
+    by:"Maria Eduarda Santana Marques · UFC Quixadá",
+    lead:"This is the test from my poster, now on your phone.",
+    s1:"Keep your face visible to the front camera.",s2:"Close your eyes for more than 1.5 s: the alert triggers.",s3:"Smile or yawn with closed eyes: no alert.",
+    begin:"Start the test",
+    title:"Drowsiness Detector · EAR + MAR",sub:"Poster project preview · SBESC 2026",
+    closed:"Eyes closed",det:"Detections",
     vnote:"Vehicle simulation: the alert equals the 'p' (stop) command; 2 s of open eyes equals 'c' (continue), and the vehicle waits another 2 s before moving.",
     calib:"Calibration",earT:"EAR threshold",marT:"MAR threshold",tAlert:"Alert time",
     priv:"Video is processed on your device and is neither uploaded nor recorded.",
@@ -118,10 +173,10 @@ const $ = id => document.getElementById(id);
 function applyLang(){
   document.documentElement.lang = lang==="pt"?"pt-BR":"en";
   document.querySelectorAll("[data-i]").forEach(e=>e.textContent=T[lang][e.dataset.i]);
-  $("lang").textContent = lang==="pt"?"EN":"PT";
+  document.querySelectorAll(".lang").forEach(b=>b.textContent = lang==="pt"?"EN":"PT");
   document.title = T[lang].title;
 }
-$("lang").onclick = ()=>{lang = lang==="pt"?"en":"pt"; applyLang();};
+document.querySelectorAll(".lang").forEach(b=>b.onclick=()=>{lang = lang==="pt"?"en":"pt"; applyLang();});
 applyLang();
 
 // ---------- landmarks (iguais ao código original) ----------
@@ -129,8 +184,6 @@ const OLHO_ESQ = [385,380,387,373,362,263];
 const OLHO_DIR = [160,144,158,153,33,133];
 const BOCA     = [82,87,13,14,312,317,78,308];
 
-// Distâncias em pixels reais (x*largura, y*altura), para o EAR/MAR não depender
-// da proporção da tela do celular.
 const dist = (a,b,W,H)=>Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);
 function earOlho(f,p,W,H){
   const q = p.map(i=>f[i]);
@@ -178,7 +231,7 @@ function step(ear,mar,now){
   } else {
     closedStart=null;
     if(laugh){ openStart=null; if(!alertOn) banner="laugh"; }
-    else if(alertOn){                       // olhos abertos: verificação de vigília
+    else if(alertOn){
       if(openStart===null) openStart=now;
       if((now-openStart)/1000>=cfg.tVerify){
         alertOn=false; openStart=null; vehicle="wait"; resumeAt=now+cfg.tVehicle*1000;
@@ -214,7 +267,9 @@ function moveCar(){
 let landmarker, video=$("v"), canvas=$("c"), ctx=canvas.getContext("2d"), lastT=-1;
 
 async function start(){
-  $("start").disabled=true; $("msg").textContent=T[lang].loading;
+  $("start").disabled=true; $("msg").style.color="#1d2b3a"; $("msg").textContent=T[lang].loading;
+  // a tela de detecção fica montada por baixo da tela inicial, para o vídeo poder tocar
+  $("stage").style.display="block"; $("hud").style.display="block"; $("cfg").style.display="block";
   try{
     const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:640},height:{ideal:480}},audio:false});
     video.srcObject=stream; await video.play();
@@ -223,12 +278,12 @@ async function start(){
                       runningMode:"VIDEO",numFaces:1,minFaceDetectionConfidence:0.5,minTrackingConfidence:0.5});
     try{ landmarker = await FaceLandmarker.createFromOptions(fs,opts("GPU")); }
     catch(e){ landmarker = await FaceLandmarker.createFromOptions(fs,opts("CPU")); }
-    $("msg").textContent="";
-    $("stage").style.display="block"; $("hud").style.display="block"; $("cfg").style.display="block";
-    $("start").style.display="none"; $("intro").style.display="none";
+    $("landing").style.display="none";
+    window.scrollTo(0,0);
     requestAnimationFrame(loop);
   }catch(e){
-    console.error(e); $("msg").textContent=T[lang].err; $("start").disabled=false;
+    console.error(e);
+    $("msg").style.color="#7a1f1f"; $("msg").textContent=T[lang].err; $("start").disabled=false;
   }
 }
 $("start").onclick=start;
